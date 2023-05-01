@@ -89,12 +89,82 @@ module move_and_merge_tiles (
       end
 
       4'b0100: begin // Left Move
+        for (i = 0; i < 4; i++) begin
+          // Compress
+          k = 0;
+          for (j = 0; j < 4; j++) begin
+            if (local_board[i][j] != 12'b0) begin
+              local_board[i][k] = local_board[i][j];
+              if (k != j) begin
+                local_board[i][j] = 12'b0;
+              end
+              k = k + 1;
+            end
+          end
+
+          // Merge
+          for (j = 0; j < 3; j++) begin
+            if (local_board[i][j] == local_board[i][j + 1]) begin
+              local_board[i][j] = local_board[i][j] + local_board[i][j + 1];
+              local_board[i][j + 1] = 12'b0;
+              local_score_update = local_score_update + local_board[i][j];
+            end
+          end
+
+          // Compress again after merging
+          k = 0;
+          for (j = 0; j < 4; j++) begin
+            if (local_board[i][j] != 12'b0) begin
+              local_board[i][k] = local_board[i][j];
+              if (k != j) begin
+                local_board[i][j] = 12'b0;
+              end
+              k = k + 1;
+            end
+          end
+        end
       end
 
       4'b1000: begin // Right Move
+        for (i = 0; i < 4; i++) begin
+          // Compress
+          k = 3;
+          for (j = 3; j >= 0; j--) begin
+            if (local_board[i][j] != 12'b0) begin
+              local_board[i][k] = local_board[i][j];
+              if (k != j) begin
+                local_board[i][j] = 12'b0;
+              end
+              k = k - 1;
+            end
+          end
+
+          // Merge
+          for (j = 3; j > 0; j--) begin
+            if (local_board[i][j] == local_board[i][j - 1]) begin
+              local_board[i][j] = local_board[i][j] + local_board[i][j - 1];
+              local_board[i][j - 1] = 12'b0;
+              local_score_update = local_score_update + local_board[i][j];
+            end
+          end
+
+          // Compress again after merging
+          k = 3;
+          for (j = 3; j >= 0; j--) begin
+            if (local_board[i][j] != 12'b0) begin
+              local_board[i][k] = local_board[i][j];
+              if (k != j) begin
+                local_board[i][j] = 12'b0;
+              end
+              k = k - 1;
+            end
+          end
+        end
       end
+
       default: begin
       end
+      
     endcase
   end
 

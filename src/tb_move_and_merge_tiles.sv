@@ -25,7 +25,7 @@ module tb_move_and_merge_tiles;
   initial begin
     // Initialize inputs
     clk = 0;
-    direction = 4'b0010; // Move up
+    direction = 4'b1000; // Move up
 
     // Initialize board
     board_in[0][0] = 12'h002; board_in[0][1] = 12'h002; board_in[0][2] = 12'h004; board_in[0][3] = 12'h004;
