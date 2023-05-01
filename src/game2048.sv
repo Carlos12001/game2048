@@ -8,7 +8,7 @@ module game2048 #(parameter WIDTH = 11)(
   input logic clk,
   input logic rst,
   input logic [3:0] direction,
-  output logic [3:0][3:0] board,
+  output logic  [11:0] board[3:0][3:0],
   output logic [19:0] score, 
   output logic [1:0] game_state
   );
