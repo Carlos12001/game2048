@@ -52,6 +52,40 @@ module move_and_merge_tiles (
       end
 
       4'b0010: begin // Bottom Move
+        for (i = 0; i < 4; i++) begin
+          // Compress
+          k = 3;
+          for (j = 3; j >= 0; j--) begin
+            if (local_board[j][i] != 12'b0) begin
+              local_board[k][i] = local_board[j][i];
+              if (k != j) begin
+                local_board[j][i] = 12'b0;
+              end
+              k = k - 1;
+            end
+          end
+
+          // Merge
+          for (j = 3; j > 0; j--) begin
+            if (local_board[j][i] == local_board[j - 1][i]) begin
+              local_board[j][i] = local_board[j][i] + local_board[j - 1][i];
+              local_board[j - 1][i] = 12'b0;
+              local_score_update = local_score_update + local_board[j][i];
+            end
+          end
+
+          // Compress again after merging
+          k = 3;
+          for (j = 3; j >= 0; j--) begin
+            if (local_board[j][i] != 12'b0) begin
+              local_board[k][i] = local_board[j][i];
+              if (k != j) begin
+                local_board[j][i] = 12'b0;
+              end
+              k = k - 1;
+            end
+          end
+        end
       end
 
       4'b0100: begin // Left Move

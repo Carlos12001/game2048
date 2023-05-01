@@ -25,13 +25,13 @@ module tb_move_and_merge_tiles;
   initial begin
     // Initialize inputs
     clk = 0;
-    direction = 4'b0001; // Move up
+    direction = 4'b0010; // Move up
 
     // Initialize board
     board_in[0][0] = 12'h002; board_in[0][1] = 12'h002; board_in[0][2] = 12'h004; board_in[0][3] = 12'h004;
     board_in[1][0] = 12'h002; board_in[1][1] = 12'h002; board_in[1][2] = 12'h004; board_in[1][3] = 12'h004;
     board_in[2][0] = 12'h000; board_in[2][1] = 12'h000; board_in[2][2] = 12'h004; board_in[2][3] = 12'h000;
-    board_in[3][0] = 12'h000; board_in[3][1] = 12'h000; board_in[3][2] = 12'h004; board_in[3][3] = 12'h000;
+    board_in[3][0] = 12'h008; board_in[3][1] = 12'h000; board_in[3][2] = 12'h004; board_in[3][3] = 12'h000;
 
         // Display results
     $display("Board before move:");
