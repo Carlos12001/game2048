@@ -25,11 +25,14 @@ module place_random_four (
   logic [11:0] local_board[3:0][3:0];
   integer row, col;
 
+  // Señal de control para cambiar de estado
+  logic move_to_next_state;
+  
   // Logica de estado
   always @(posedge clk or posedge rst) begin
     if (rst) begin
       current_state <= IDLE;
-    end else begin
+    end else if (move_to_next_state) begin
       current_state <= next_state;
     end
   end
@@ -39,11 +42,13 @@ module place_random_four (
     row = lfsr[3:2];
     col = lfsr[1:0];
     done = 0;
+    move_to_next_state = 0;
 
     case (current_state)
       IDLE: begin
         if (start) begin
           next_state = SEARCH;
+          move_to_next_state = 1;
         end else begin
           next_state = IDLE;
         end
@@ -53,14 +58,17 @@ module place_random_four (
         if (board_in[row][col] == 0) begin
           local_board[row][col] = 12'h004;
           next_state = FINISH;
+          move_to_next_state = 1;
         end else begin
           next_state = SEARCH;
+          move_to_next_state = 1;
         end
       end
 
       FINISH: begin
         done = 1;
         next_state = IDLE;
+        move_to_next_state = 1;
       end
 
       default: begin
