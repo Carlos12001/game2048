@@ -31,7 +31,14 @@ module tb_move_and_merge_tiles;
     board_in[0][0] = 12'h002; board_in[0][1] = 12'h002; board_in[0][2] = 12'h004; board_in[0][3] = 12'h004;
     board_in[1][0] = 12'h002; board_in[1][1] = 12'h002; board_in[1][2] = 12'h004; board_in[1][3] = 12'h004;
     board_in[2][0] = 12'h000; board_in[2][1] = 12'h000; board_in[2][2] = 12'h004; board_in[2][3] = 12'h000;
-    board_in[3][0] = 12'h000; board_in[3][1] = 12'h000; board_in[3][2] = 12'h003; board_in[3][3] = 12'h000;
+    board_in[3][0] = 12'h000; board_in[3][1] = 12'h000; board_in[3][2] = 12'h004; board_in[3][3] = 12'h000;
+
+        // Display results
+    $display("Board before move:");
+    for (integer i = 0; i < 4; i++) begin
+      $display("%h %h %h %h", board_in[i][0], board_in[i][1], board_in[i][2], board_in[i][3]);
+    end
+
 
     // Apply stimulus and wait for results
     #10;
