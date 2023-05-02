@@ -3,7 +3,6 @@
  direction: 0001 top, 0010 bottom, 0100 left, 1000 right
  game_state: 00 not_playing, 01 playing, 10 win, 11 lose
 */
-
 module game2048 (
   input logic clk,
   input logic rst,
@@ -13,23 +12,39 @@ module game2048 (
   output logic [1:0] game_state
 );
 
-  // typedef enum logic [2:0] {START, IDLE, MOVE_MERGE, NEW_TILE, CHECK_END, GAME_OVER} state_t;
+  // typedef enum logic [2:0] {START, SECOND_RANDOM_TILE, IDLE, 
+  // MOVE_MERGE, NEW_TILE, CHECK_WIN, CHECK_TIE, GAME_OVER} state_t;
   // state_t current_state, next_state;
 
-  // logic [11:0] board_temp[3:0][3:0];
+  // logic [11:0] board_move[3:0][3:0];
+  // logic [11:0] board_random[3:0][3:0]; 
   // logic [19:0] score_update;
   // logic move_and_merge_done;
   // logic place_random_done;
+  // logic check_win_done;
+  // logic check_tie_done;
+
 
   // move_and_merge_tiles move_and_merge (
   //   .direction(direction),
   //   .board_in(board),
-  //   .board_out(board_temp),
+  //   .board_out(board_move),
   //   .score_update(score_update)
+  //   // .done(place_random_done)
+  // );
+
+  // place_random_four place_random (
+  //   .clk(clk),
+  //   .rst(rst),
+  //   .start(move_and_merge_done),
+  //   .board_in(board),
+  //   .board_out(board_random),
+  //   .done(place_random_done)
   // );
 
   // always_ff @(posedge clk) begin
   //   if (rst) begin
+  //     game_state = 2'b00; // playing
   //     current_state <= START;
   //   end else begin
   //     current_state <= next_state;
@@ -37,65 +52,55 @@ module game2048 (
   // end
 
   // always_comb begin
-  //   game_state = 2'b01; // playing
   //   move_and_merge_done = 1'b0;
   //   place_random_done = 1'b0;
+  //   check_win_done = 1'b0;
+  //   check_tie_done = 1'b0;
   //   next_state = current_state;
 
   //   case (current_state)
   //     START: begin
-  //       // Initialize board and score
-  //       for (integer i = 0; i < 4; i++) begin
-  //         for (integer j = 0; j < 4; j++) begin
-  //           board[i][j] = 12'b0;
-  //         end
-  //       end
+  //       // initaliza la board con dos numros 4 en posiciones aleatorias
   //       score = 20'b0;
-  //       next_state = IDLE;
+  //       // No avanza hasta el siguiente estado si hasta que termine de colocar los 4
+  //       if (place_random_done) begin 
+  //         board = board_random;
+  //         game_state = 2'b01; 
+  //         next_state = SECOND_RANDOM_TILE;
+  //       end
   //     end
 
   //     IDLE: begin
+  //       // No avanza hasta que se reciba un nuevo movimiento
   //       if (direction != 4'b0) begin
+  //         game_state = 2'b01; 
   //         next_state = MOVE_MERGE;
   //       end
   //     end
 
   //     MOVE_MERGE: begin
-  //       move_and_merge_done = 1'b1;
-  //       board = board_temp;
-  //       score = score + score_update;
-  //       next_state = NEW_TILE;
+  //       // No avanza con el siguiente estado hasta termina de hacer los movimientos
+  //       if(move_and_merge_done) begin
+  //         board = board_move;
+  //         score = score + score_update;
+  //         next_state = NEW_TILE;
+  //       end
   //     end
 
   //     NEW_TILE: begin
-  //       place_random_done = 1'b1;
-  //       board = board_temp;
-  //       next_state = CHECK_END;
-  //     end
-
-  //     CHECK_END: begin
-  //       // Check for win or lose
-  //       // Update game_state accordingly
-  //       // If game continues, go to IDLE, otherwise go to GAME_OVER
-  //       if (/* win condition */) begin
-  //         game_state = 2'b10; // win
-  //         next_state = GAME_OVER;
-  //       end else if (/* lose condition */) begin
-  //         game_state = 2'b11; // lose
-  //         next_state = GAME_OVER;
-  //       end else begin
-  //         next_state = IDLE;
+  //       // No avanza con el siguiente estado hasta termina de pone el numero 
+  //       if (place_random_done) begin
+  //         board = board_random;
+  //         next_state = CHECK_WIN;
   //       end
   //     end
 
   //     GAME_OVER: begin
-  //       // Stay in this state until reset
   //     end
 
   //     default: begin
-  //       next_state = IDLE;
+  //       next_state = START;
   //     end
   //   endcase
   // end
-
 endmodule
