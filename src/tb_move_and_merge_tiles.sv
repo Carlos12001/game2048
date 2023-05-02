@@ -6,13 +6,15 @@ module tb_move_and_merge_tiles;
   logic [11:0] board_in[3:0][3:0];
   logic [11:0] board_out[3:0][3:0];
   logic [19:0] score_update;
+  logic done;
 
   // Instantiate the design under test (DUT)
   move_and_merge_tiles dut (
     .direction(direction),
     .board_in(board_in),
     .board_out(board_out),
-    .score_update(score_update)
+    .score_update(score_update),
+    .done(done)
   );
 
   // Clock generation
@@ -25,7 +27,7 @@ module tb_move_and_merge_tiles;
   initial begin
     // Initialize inputs
     clk = 0;
-    direction = 4'b1000; // Move up
+    direction = 4'b0000; 
 
     // Initialize board
     board_in[0][0] = 12'h002; board_in[0][1] = 12'h002; board_in[0][2] = 12'h004; board_in[0][3] = 12'h004;
@@ -39,9 +41,23 @@ module tb_move_and_merge_tiles;
       $display("%h %h %h %h", board_in[i][0], board_in[i][1], board_in[i][2], board_in[i][3]);
     end
 
+    if (done) begin 
+      $display("Done_1");
+    end
+
+    #10;
+     if (done) begin 
+      $display("Done_2"); 
+    end
+
+    direction = 4'b0010;
 
     // Apply stimulus and wait for results
     #10;
+    if (done) begin 
+      $display("Done_3"); 
+    end
+
 
     // Display results
     $display("Board after move:");
@@ -49,6 +65,21 @@ module tb_move_and_merge_tiles;
       $display("%h %h %h %h", board_out[i][0], board_out[i][1], board_out[i][2], board_out[i][3]);
     end
     $display("Score update: %h", score_update);
+
+    board_in = board_out;
+
+    #10;
+ 
+    direction = 4'b0000;
+    if (done) begin 
+      $display("Done_4"); 
+    end
+
+    #10;
+
+    if (done) begin 
+      $display("Done_5"); 
+    end
 
     // Finish simulation
     $finish;

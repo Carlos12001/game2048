@@ -48,16 +48,25 @@ module tb_place_random_four;
     @(posedge clk) start <= 1;
     @(posedge clk) start <= 0;
 
-    // Espera a que se coloque el 4 en una posición aleatoria
-    wait(done);
+    if (done) begin
+      $display("Done_1");
+    end
 
-    // Imprime la matriz de entrada
+        // Imprime la matriz de entrada
     $display("Initial board:");
     for (i = 0; i < 4; i++) begin
       for (j = 0; j < 4; j++) begin
         $write("%4d ", board_in[i][j]);
       end
       $display("");
+    end
+
+
+    // Espera a que se coloque el 4 en una posición aleatoria
+    wait(done);
+
+    if (done) begin 
+      $display("Done_3"); 
     end
 
     // Imprime la matriz de salida
@@ -68,6 +77,8 @@ module tb_place_random_four;
       end
       $display("");
     end
+
+    #10;
 
     $finish;
   end

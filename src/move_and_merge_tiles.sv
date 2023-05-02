@@ -2,7 +2,8 @@ module move_and_merge_tiles (
   input logic [3:0] direction,
   input logic [11:0] board_in[3:0][3:0],
   output logic [11:0] board_out[3:0][3:0],
-  output logic [19:0] score_update
+  output logic [19:0] score_update,
+  output logic done
 );
 
   logic [11:0] local_board[3:0][3:0];
@@ -12,6 +13,7 @@ module move_and_merge_tiles (
   always_comb begin
     local_board = board_in;
     local_score_update = 0;
+    done = 1'b0;
 
     case (direction)
       4'b0001: begin // Top Move
@@ -49,6 +51,7 @@ module move_and_merge_tiles (
             end
           end
         end
+        done = 1'b1;
       end
 
       4'b0010: begin // Bottom Move
@@ -86,6 +89,7 @@ module move_and_merge_tiles (
             end
           end
         end
+        done = 1'b1;
       end
 
       4'b0100: begin // Left Move
@@ -123,6 +127,7 @@ module move_and_merge_tiles (
             end
           end
         end
+        done = 1'b1;
       end
 
       4'b1000: begin // Right Move
@@ -160,9 +165,11 @@ module move_and_merge_tiles (
             end
           end
         end
+        done = 1'b1;
       end
 
       default: begin
+        done = 1'b0;
       end
       
     endcase
