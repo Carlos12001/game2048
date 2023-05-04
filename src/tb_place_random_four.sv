@@ -1,15 +1,14 @@
 `timescale 1ns / 1ps
 
-module tb_place_random_four;
+module tb_place_random_four();
+  logic clk;
+  logic rst;
+  logic start;
+  logic [11:0] board_in[3:0][3:0];
+  logic [11:0] board_out[3:0][3:0];
+  logic done;
 
-  reg clk;
-  reg rst;
-  reg start;
-  reg [11:0] board_in[3:0][3:0];
-  wire [11:0] board_out[3:0][3:0];
-  wire done;
-
-  place_random_four place_random_four_inst (
+  place_random_four dut (
     .clk(clk),
     .rst(rst),
     .start(start),
@@ -18,68 +17,65 @@ module tb_place_random_four;
     .done(done)
   );
 
-  initial begin
-    clk = 0;
-    forever #5 clk = ~clk;
+  // Clock generation
+  always begin
+    #5 clk = ~clk;
   end
 
-  integer i, j;
+  // Display board
+  task display_board;
+    input logic [11:0] board[3:0][3:0];
+    begin
+      for (int i = 0; i < 4; i++) begin
+        for (int j = 0; j < 4; j++) begin
+          $write("%4d \t", board[i][j]);
+        end
+        $display("\n");
+      end
+      $display("\n");
+    end
+  endtask
 
   initial begin
-    reg [11:0] temp_board[4][4];
+    // Initialize signals
+    clk = 0;
+    #10;
     rst = 1;
     start = 0;
 
-    // Llena la matriz
-    temp_board = '{
-      '{12'h008, 12'h008, 12'h008, 12'h000},
-      '{12'h008, 12'h008, 12'h008, 12'h000},
-      '{12'h008, 12'h008, 12'h008, 12'h000},
-      '{12'h008, 12'h008, 12'h008, 12'h000}
-    };
-
-    for (i = 0; i < 4; i++) begin
-      for (j = 0; j < 4; j++) begin
-        board_in[i][j] <= temp_board[i][j];
+    // Initialize board
+    for (int i = 0; i < 4; i++) begin
+      for (int j = 0; j < 4; j++) begin
+        board_in[i][j] = 0;
       end
     end
 
-    @(posedge clk) rst <= 0;
-    @(posedge clk) start <= 1;
-    @(posedge clk) start <= 0;
-
-    if (done) begin
-      $display("Done_1");
-    end
-
-        // Imprime la matriz de entrada
+    // Test process
+    #10;
+    rst = 0;
+    #10;
     $display("Initial board:");
-    for (i = 0; i < 4; i++) begin
-      for (j = 0; j < 4; j++) begin
-        $write("%4d ", board_in[i][j]);
-      end
-      $display("");
-    end
+    display_board(board_in);
 
-
-    // Espera a que se coloque el 4 en una posición aleatoria
-    wait(done);
-
-    if (done) begin 
-      $display("Done_3"); 
-    end
-
-    // Imprime la matriz de salida
-    $display("Board after placing random 4:");
-    for (i = 0; i < 4; i++) begin
-      for (j = 0; j < 4; j++) begin
-        $write("%4d ", board_out[i][j]);
-      end
-      $display("");
-    end
+    // Add first 4
+    start = 1;
+    #10;
+    start = 0;
+    @(posedge done);
+    $display("Board after adding first 4:");
+    display_board(board_out);
+    board_in = board_out;
+    #10
+    start = 1;
 
     #10;
+    start = 0;
+    @(posedge done);
+    #10; // Agrega un retardo adicional aquí
+    $display("Board after adding second 4:");
+    display_board(board_out);
 
+    // Finish simulation
     $finish;
   end
 

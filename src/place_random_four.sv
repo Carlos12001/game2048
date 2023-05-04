@@ -38,7 +38,6 @@ module place_random_four (
   end
 
   always_comb begin
-    local_board = board_in;
     row = lfsr[3:2];
     col = lfsr[1:0];
     done = 0;
@@ -47,6 +46,7 @@ module place_random_four (
     case (current_state)
       IDLE: begin
         if (start) begin
+          local_board = board_in;
           next_state = SEARCH;
           move_to_next_state = 1;
         end else begin
