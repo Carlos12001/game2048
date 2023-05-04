@@ -12,95 +12,155 @@ module game2048 (
   output logic [1:0] game_state
 );
 
-  // typedef enum logic [2:0] {START, SECOND_RANDOM_TILE, IDLE, 
-  // MOVE_MERGE, NEW_TILE, CHECK_WIN, CHECK_TIE, GAME_OVER} state_t;
-  // state_t current_state, next_state;
+  typedef enum logic [3:0] {START, FIRST_RANDOM_TILE, TRANSITION_RANDOM, SECOND_RANDOM_TILE, IDLE, 
+  MOVE_MERGE, NEW_TILE, CHECK_WIN, CHECK_TIE, GAME_OVER} state_t;
+  state_t current_state, next_state;
 
-  // logic [11:0] board_move[3:0][3:0];
-  // logic [11:0] board_random[3:0][3:0]; 
-  // logic [19:0] score_update;
-  // logic move_and_merge_done;
-  // logic place_random_done;
-  // logic check_win_done;
-  // logic check_tie_done;
+	logic [11:0] board_move[3:0][3:0];
+	logic [11:0] board_random[3:0][3:0]; 
+	logic [19:0] score_update;
+	logic move_and_merge_start;
+	logic move_and_merge_done;
+	logic place_random_start;
+	logic place_random_done;
+	logic check_win_done;
+	logic check_win_result;
+	logic check_tie_done;
+	logic check_tie_result;
 
+	// Modifica aquí: Agrega la señal move_and_merge_start
+	move_and_merge_tiles move_and_merge (
+	 .direction(direction),
+	 .board_in(board),
+	 .board_out(board_move),
+	 .score_update(score_update),
+	 .done(move_and_merge_done)
+	);
 
-  // move_and_merge_tiles move_and_merge (
-  //   .direction(direction),
-  //   .board_in(board),
-  //   .board_out(board_move),
-  //   .score_update(score_update)
-  //   // .done(place_random_done)
-  // );
+	place_random_four place_random (
+	 .clk(clk),
+	 .rst(rst),
+	 .start(place_random_start),
+	 .board_in(board),
+	 .board_out(board_random),
+	 .done(place_random_done)
+	);
 
-  // place_random_four place_random (
-  //   .clk(clk),
-  //   .rst(rst),
-  //   .start(move_and_merge_done),
-  //   .board_in(board),
-  //   .board_out(board_random),
-  //   .done(place_random_done)
-  // );
+	// check_win win (
+	//   .clk(clk),
+	//   .rst(rst),
+	//   .board_in(board),
+	//   .result(check_win_result)
+	// );
 
-  // always_ff @(posedge clk) begin
-  //   if (rst) begin
-  //     game_state = 2'b00; // playing
-  //     current_state <= START;
-  //   end else begin
-  //     current_state <= next_state;
-  //   end
-  // end
+	// check_tie tie (
+	//   .clk(clk),
+	//   .rst(rst),
+	//   .board_in(board),
+	//   .result(check_tie_result)
+	// );
 
-  // always_comb begin
-  //   move_and_merge_done = 1'b0;
-  //   place_random_done = 1'b0;
-  //   check_win_done = 1'b0;
-  //   check_tie_done = 1'b0;
-  //   next_state = current_state;
+	always_ff @(posedge clk) begin
+	 if (rst) begin
+		current_state <= START;
+	 end else begin
+		current_state <= next_state;
+	 end
+	end
 
-  //   case (current_state)
-  //     START: begin
-  //       // initaliza la board con dos numros 4 en posiciones aleatorias
-  //       score = 20'b0;
-  //       // No avanza hasta el siguiente estado si hasta que termine de colocar los 4
-  //       if (place_random_done) begin 
-  //         board = board_random;
-  //         game_state = 2'b01; 
-  //         next_state = SECOND_RANDOM_TILE;
-  //       end
-  //     end
+	always_comb begin
+	 move_and_merge_done = 0;
+	 place_random_start = 0;
+	 place_random_done = 0;
+	 check_win_done = 0;
+   check_win_result = 0;
+   check_tie_done = 0;
+	 check_tie_result = 0;
+	 next_state = current_state;
 
-  //     IDLE: begin
-  //       // No avanza hasta que se reciba un nuevo movimiento
-  //       if (direction != 4'b0) begin
-  //         game_state = 2'b01; 
-  //         next_state = MOVE_MERGE;
-  //       end
-  //     end
+	 case (current_state)
+		START: begin
+  		for (int i = 0; i < 4; i++) begin
+		    for (int j = 0; j < 4; j++) begin
+  			 board[i][j] = 0;
+  		  end
+  		end
+      score = 0;
+      game_state = 0;
+		  place_random_start = 1;
+		  next_state = FIRST_RANDOM_TILE;
+		end
 
-  //     MOVE_MERGE: begin
-  //       // No avanza con el siguiente estado hasta termina de hacer los movimientos
-  //       if(move_and_merge_done) begin
-  //         board = board_move;
-  //         score = score + score_update;
-  //         next_state = NEW_TILE;
-  //       end
-  //     end
+		FIRST_RANDOM_TILE: begin
+		  place_random_start = 0;
+		  if (place_random_done) begin
+			 board = board_random;
+			 next_state = TRANSITION_RANDOM;
+		  end
+		end
 
-  //     NEW_TILE: begin
-  //       // No avanza con el siguiente estado hasta termina de pone el numero 
-  //       if (place_random_done) begin
-  //         board = board_random;
-  //         next_state = CHECK_WIN;
-  //       end
-  //     end
+		TRANSITION_RANDOM: begin
+		  place_random_start = 1;
+		  next_state = SECOND_RANDOM_TILE;
+		end
 
-  //     GAME_OVER: begin
-  //     end
+		SECOND_RANDOM_TILE: begin
+		  place_random_start = 0;
+		  if (place_random_done) begin
+			 game_state = 2'b01; 
+			 board = board_random;
+			 next_state = IDLE;
+		  end
+		end
 
-  //     default: begin
-  //       next_state = START;
-  //     end
-  //   endcase
-  // end
+		IDLE: begin
+		  if (direction != 4'b0) begin
+			 next_state = MOVE_MERGE;
+		  end
+		end
+
+		MOVE_MERGE: begin
+		  if(move_and_merge_done) begin
+			 board = board_move;
+			 score = score + score_update; 
+			 place_random_start = 1;
+			 next_state = NEW_TILE;
+			 end
+		end
+
+		NEW_TILE: begin
+		  place_random_start = 0;
+		  if (place_random_done) begin
+			 board = board_random;
+			 next_state = CHECK_WIN;
+		  end
+		end
+
+		CHECK_WIN: begin
+		  // if (check_win_done) begin
+		  //   game_state = 2'b10; // win
+		  //   next_state = GAME_OVER;
+		  // end else begin
+		  //   next_state = CHECK_TIE;
+		  // end
+		  next_state = IDLE;
+		end
+
+		CHECK_TIE: begin
+		  if (check_tie_done) begin
+			 game_state = 2'b11; // lose
+			 next_state = GAME_OVER;
+		  end else begin
+			 next_state = IDLE;
+		  end
+		end
+
+		GAME_OVER: begin
+		end
+
+		default: begin
+		  next_state = START;
+		end
+	 endcase
+	end
 endmodule
