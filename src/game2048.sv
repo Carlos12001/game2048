@@ -3,7 +3,7 @@
  direction: 0001 top, 0010 bottom, 0100 left, 1000 right
  game_state: 00 not_playing, 01 playing, 10 win, 11 lose
 */
-module game2048 (
+module game2048 #(paramater MAX_WIN=11) (
   input logic clk,
   input logic rst,
   input logic [3:0] direction,
