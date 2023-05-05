@@ -27,7 +27,7 @@ module game2048(
 	logic place_random_done;
 	logic check_win_result;
 	logic check_lose_result;
-	logic check_new_tile;
+	logic check_new_tile_result;
 
 	move_and_merge_tiles move_and_merge (
 	 .direction(direction),
@@ -45,6 +45,11 @@ module game2048(
 	 .board_out(board_random),
 	 .done(place_random_done)
 	);
+
+	can_new_tile new_tile(
+        .board_in(board),
+        .result(check_new_tile_result)
+    );
 
 	check_win win (
 		.num_max_win(num_max_win),
@@ -118,7 +123,9 @@ module game2048(
 		end
 
 		TRANSITION_NEW_RANDOM: begin
-			place_random_start = 1;
+			if (check_new_tile_result) begin
+				place_random_start = 1;
+			end
 			next_state = NEW_TILE;
 		end
 

@@ -57,7 +57,6 @@ module place_random_tiles (
           local_board[row][col] = 12'h002;
           next_state = FINISH;
         end else begin
-          done = 1;
           next_state = SEARCH;
         end
       end
