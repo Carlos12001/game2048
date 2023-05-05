@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module tb_place_random_four();
+module tb_place_random_tiles();
   logic clk;
   logic rst;
   logic start;
@@ -8,7 +8,7 @@ module tb_place_random_four();
   logic [11:0] board_out[3:0][3:0];
   logic done;
 
-  place_random_four dut (
+  place_random_tiles dut (
     .clk(clk),
     .rst(rst),
     .start(start),

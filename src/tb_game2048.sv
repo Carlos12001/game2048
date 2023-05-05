@@ -4,7 +4,7 @@ module tb_game2048();
   logic clk;
   logic rst;
   logic [3:0] direction;
-  logic [11:0] board[3:0][3:0];
+  logic [11:0] board_game[3:0][3:0];
   logic [19:0] score;
   logic [1:0] game_state;
 
@@ -12,7 +12,7 @@ module tb_game2048();
     .clk(clk),
     .rst(rst),
     .direction(direction),
-    .board(board),
+    .board(board_game),
     .score(score),
     .game_state(game_state)
   );
@@ -48,30 +48,32 @@ module tb_game2048();
     rst = 0;
     #50;
     $display("Initial board:");
-    display_board(board);
+    display_board(board_game);
 
-    // Play some moves
+    #10;
     direction = 4'b1000; // right
     #10;
+    direction = 4'b0000; // right
+    #10;
     $display("print R1: Board after move right:");
-    display_board(board);
+    display_board(board_game);
 
-    direction = 4'b0000; // left
-    #10;
-    $display("print R2: Board after move right:");
-    display_board(board);
+    // direction = 4'b0000; // left
+    // #10;
+    // $display("print R2: Board after move right:");
+    // display_board(board_game);
 
-    #10;
-    $display("print R3: Board after move right:");
-    display_board(board);
+    // #10;
+    // $display("print R3: Board after move right:");
+    // display_board(board_game);
 
-    #10;
-    $display("print R4: Board after move right:");
-    display_board(board);
+    // #10;
+    // $display("print R4: Board after move right:");
+    // display_board(board_game);
 
-    #10;
-    $display("print R5: Board after move right:");
-    display_board(board);
+    // #10;
+    // $display("print R5: Board after move right:");
+    // display_board(board_game);
 
     // #10;
     // $display("Board after move left:");

@@ -12,14 +12,13 @@ module game2048 (
   output logic [1:0] game_state
 );
 
-  typedef enum logic [3:0] {START, FIRST_RANDOM_TILE, TRANSITION_RANDOM, SECOND_RANDOM_TILE, IDLE, 
-  MOVE_MERGE, NEW_TILE, CHECK_WIN, CHECK_TIE, GAME_OVER} state_t;
-  state_t current_state, next_state;
+	typedef enum logic [3:0] {START, FIRST_RANDOM_TILE, TRANSITION_RANDOM, SECOND_RANDOM_TILE, IDLE, 
+	MOVE_MERGE, NEW_TILE, CHECK_WIN, CHECK_TIE, GAME_OVER} state_t;
+	state_t current_state, next_state;
 
 	logic [11:0] board_move[3:0][3:0];
 	logic [11:0] board_random[3:0][3:0]; 
 	logic [19:0] score_update;
-	logic move_and_merge_start;
 	logic move_and_merge_done;
 	logic place_random_start;
 	logic place_random_done;
@@ -37,7 +36,7 @@ module game2048 (
 	 .done(move_and_merge_done)
 	);
 
-	place_random_four place_random (
+	place_random_tiles place_random (
 	 .clk(clk),
 	 .rst(rst),
 	 .start(place_random_start),
@@ -61,62 +60,58 @@ module game2048 (
 	// );
 
 	always_ff @(posedge clk) begin
-	 if (rst) begin
-		current_state <= START;
-	 end else begin
-		current_state <= next_state;
-	 end
+		if (rst) begin
+			current_state <= START;
+		end else begin
+			current_state <= next_state;
+		end
 	end
 
 	always_comb begin
-	 move_and_merge_done = 0;
-	 place_random_start = 0;
-	 place_random_done = 0;
-	 check_win_done = 0;
-   check_win_result = 0;
-   check_tie_done = 0;
-	 check_tie_result = 0;
-	 next_state = current_state;
 
 	 case (current_state)
 		START: begin
-  		for (int i = 0; i < 4; i++) begin
-		    for (int j = 0; j < 4; j++) begin
-  			 board[i][j] = 0;
-  		  end
-  		end
-      score = 0;
-      game_state = 0;
-		  place_random_start = 1;
-		  next_state = FIRST_RANDOM_TILE;
+			for (int i = 0; i < 4; i++) begin
+			    for (int j = 0; j < 4; j++) begin
+				 board[i][j] = 0;
+			  end
+			end
+			score = 0;
+			game_state = 0;
+			place_random_start = 1;
+			check_win_done = 0;
+			check_win_result = 0;
+			check_tie_done = 0;
+			check_tie_result = 0;
+			next_state = FIRST_RANDOM_TILE;
 		end
 
 		FIRST_RANDOM_TILE: begin
-		  place_random_start = 0;
-		  if (place_random_done) begin
-			 board = board_random;
-			 next_state = TRANSITION_RANDOM;
+			place_random_start = 0;
+			if (place_random_done) begin
+				board = board_random;
+				next_state = TRANSITION_RANDOM;
 		  end
 		end
 
 		TRANSITION_RANDOM: begin
-		  place_random_start = 1;
-		  next_state = SECOND_RANDOM_TILE;
+			place_random_start = 1;
+			next_state = SECOND_RANDOM_TILE;
 		end
 
 		SECOND_RANDOM_TILE: begin
-		  place_random_start = 0;
-		  if (place_random_done) begin
-			 game_state = 2'b01; 
-			 board = board_random;
-			 next_state = IDLE;
-		  end
+			place_random_start = 0;
+			if (place_random_done) begin
+				game_state = 2'b01; 
+				board = board_random;
+				next_state = IDLE;
+			end
 		end
 
 		IDLE: begin
-		  if (direction != 4'b0) begin
+			if (direction != 4'b0) begin
 			 next_state = MOVE_MERGE;
-		  end
+			end
 		end
 
 		MOVE_MERGE: begin
