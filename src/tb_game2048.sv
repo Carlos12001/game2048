@@ -53,41 +53,42 @@ module tb_game2048();
     #10;
     direction = 4'b1000; // right
     #10;
-    direction = 4'b0000; // right
+    direction = 4'b0000;
     #50;
-    $display("print R1: Board after move right:");
+    $display("Board after move right:");
     display_board(board_game);
 
-    // direction = 4'b0000; // left
-    // #10;
-    // $display("print R2: Board after move right:");
-    // display_board(board_game);
+    #10;
+    direction = 4'b0100; // left
+    #10;
+    direction = 4'b0000;
+    #50;
+    $display("Board after move left:");
+    display_board(board_game);
 
-    // #10;
-    // $display("print R3: Board after move right:");
-    // display_board(board_game);
+    #10;
+    direction = 4'b0010; // bottom
+    #10;
+    direction = 4'b0000;
+    #50;
+    $display("Board after move bottom:");
+    display_board(board_game);
 
-    // #10;
-    // $display("print R4: Board after move right:");
-    // display_board(board_game);
+    #10;
+    direction = 4'b0001; // top
+    #10;
+    direction = 4'b0000;
+    #50;
+    $display("Board after move top:");
+    display_board(board_game);
 
-    // #10;
-    // $display("print R5: Board after move right:");
-    // display_board(board_game);
-
-    // #10;
-    // $display("Board after move left:");
-    // display_board(board);
-
-    // direction = 4'b0001; // top
-    // #10;
-    // $display("Board after move top:");
-    // display_board(board);
-
-    // direction = 4'b0010; // bottom
-    // #10;
-    // $display("Board after move bottom:");
-    // display_board(board);
+    #10;
+    direction = 4'b0001; // top
+    #10;
+    direction = 4'b0000;
+    #50;
+    $display("Board after move top:");
+    display_board(board_game);
 
     // Finish simulation
     $finish;
