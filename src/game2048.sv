@@ -13,8 +13,10 @@ module game2048(
   output logic [1:0] game_state
 );
 
-	typedef enum logic [3:0] {START, FIRST_RANDOM_TILE, TRANSITION_RANDOM, SECOND_RANDOM_TILE, IDLE, 
-	MOVE_MERGE, NEW_TILE, CHECK_WIN, CHECK_LOSE, GAME_OVER} state_t;
+	typedef enum logic [3:0] {START, FIRST_RANDOM_TILE, TRANSITION_SECOND_RANDOM, 
+		SECOND_RANDOM_TILE, IDLE, 
+		MOVE_MERGE, TRANSITION_NEW_RANDOM, NEW_TILE, CHECK_WIN,
+		CHECK_LOSE, GAME_OVER} state_t;
 	state_t current_state, next_state;
 
 	logic [11:0] board_move[3:0][3:0];
@@ -25,6 +27,7 @@ module game2048(
 	logic place_random_done;
 	logic check_win_result;
 	logic check_lose_result;
+	logic check_new_tile;
 
 	move_and_merge_tiles move_and_merge (
 	 .direction(direction),
@@ -49,10 +52,10 @@ module game2048(
 		.result(check_win_result)
 	);
 
-	// check_lose lose (
-	//   .board_in(board),
-	//   .result(check_lose_result)
-	// );
+	check_lose lose(
+		.board_in(board),
+		.result(check_lose_result)
+	);
 
 	always_ff @(posedge clk) begin
 		if (rst) begin
@@ -69,7 +72,7 @@ module game2048(
 			for (int i = 0; i < 4; i++) begin
 			    for (int j = 0; j < 4; j++) begin
 				 board[i][j] = 0;
-			  end
+			 	end
 			end
 			score = 0;
 			game_state = 0;
@@ -81,11 +84,11 @@ module game2048(
 			place_random_start = 0;
 			if (place_random_done) begin
 				board = board_random;
-				next_state = TRANSITION_RANDOM;
+				next_state = TRANSITION_SECOND_RANDOM;
 		  end
 		end
 
-		TRANSITION_RANDOM: begin
+		TRANSITION_SECOND_RANDOM: begin
 			place_random_start = 1;
 			next_state = SECOND_RANDOM_TILE;
 		end
@@ -110,22 +113,26 @@ module game2048(
 			if(move_and_merge_done) begin
 				board = board_move;
 				score = score + score_update; 
-				place_random_start = 1;
-				next_state = NEW_TILE;
+				next_state = TRANSITION_NEW_RANDOM;
 				end
-			end
+		end
+
+		TRANSITION_NEW_RANDOM: begin
+			place_random_start = 1;
+			next_state = NEW_TILE;
+		end
 
 		NEW_TILE: begin
-		  place_random_start = 0;
-		  if (place_random_done) begin
-			 board = board_random;
-			 next_state = CHECK_WIN;
-		  end
+			place_random_start = 0;
+			if (place_random_done) begin
+				board = board_random;
+				next_state = CHECK_WIN;
+			end
 		end
 
 		CHECK_WIN: begin
 			if (check_win_result) begin
-				game_state = 2'b10;
+				game_state = 2'b10; // win
 				next_state = GAME_OVER;
 			end else begin
 				next_state = CHECK_LOSE;
@@ -133,13 +140,12 @@ module game2048(
 		end
 
 		CHECK_LOSE: begin
-		//   if (check_lose_done) begin
-		// 	 game_state = 2'b11; // lose
-		// 	 next_state = GAME_OVER;
-		//   end else begin
-		// 	 next_state = IDLE;
-		//   end
-		  next_state = IDLE;
+			if (check_lose_result) begin
+				game_state = 2'b11; // lose
+				next_state = GAME_OVER;
+			end else begin
+			 next_state = IDLE;
+			end
 		end
 
 		GAME_OVER: begin
