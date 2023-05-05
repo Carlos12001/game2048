@@ -32,7 +32,7 @@ module tb_check_win;
     board_in[1][1] = 12'b000000000000;
     board_in[2][1] = 12'b000001000000;
     #10;
-    assert(result == 1'b0) else $fatal("Caso 3: Un numero 128 en la matriz. Resultado esperado: 0. Resultado obtenido: %b", result);
+    assert(result == 1'b0) else $fatal("Caso 3: Un numero 64 en la matriz. Resultado esperado: 0. Resultado obtenido: %b", result);
 
     $display("Testbench completo. Todos los casos de prueba pasaron.");
     $finish; // Termina la simulación
