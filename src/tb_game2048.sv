@@ -54,7 +54,7 @@ module tb_game2048();
     direction = 4'b1000; // right
     #10;
     direction = 4'b0000; // right
-    #10;
+    #50;
     $display("print R1: Board after move right:");
     display_board(board_game);
 
