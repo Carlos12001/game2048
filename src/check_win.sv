@@ -10,8 +10,7 @@ module check_win #(parameter MAX_WIN = 11) (
     for (int i = 0; i < 4; i++) begin
       for (int j = 0; j < 4; j++) begin
         if (board_in[i][j] >= (12'b1 << MAX_WIN)) begin
-          win = 1'b1;
-          break;
+          win = win|1'b1;
         end
       end
     end
