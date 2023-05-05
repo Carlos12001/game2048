@@ -3,6 +3,7 @@
 module tb_game2048();
   logic clk;
   logic rst;
+  logic [11:0] num_max_win=8;
   logic [3:0] direction;
   logic [11:0] board_game[3:0][3:0];
   logic [19:0] score;
@@ -11,6 +12,7 @@ module tb_game2048();
   game2048 dut (
     .clk(clk),
     .rst(rst),
+    .num_max_win(num_max_win),
     .direction(direction),
     .board(board_game),
     .score(score),

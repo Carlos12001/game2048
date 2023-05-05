@@ -6,6 +6,7 @@
 module game2048(
   input logic clk,
   input logic rst,
+  input logic [11:0] num_max_win,
   input logic [3:0] direction,
   output logic [11:0] board[3:0][3:0],
   output logic [19:0] score, 
@@ -22,7 +23,6 @@ module game2048(
 	logic move_and_merge_done;
 	logic place_random_start;
 	logic place_random_done;
-	logic [11:0] num_max_win = 8;
 	logic check_win_result;
 	logic check_lose_result;
 
