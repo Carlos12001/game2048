@@ -102,26 +102,27 @@ module game2048 (
 		SECOND_RANDOM_TILE: begin
 			place_random_start = 0;
 			if (place_random_done) begin
-				game_state = 2'b01; 
 				board = board_random;
 				next_state = IDLE;
 			end
 		end
 
 		IDLE: begin
+			game_state = 2'b01; 
 			if (direction != 4'b0) begin
 			 next_state = MOVE_MERGE;
 			end
 		end
 
 		MOVE_MERGE: begin
-		  if(move_and_merge_done) begin
-			 board = board_move;
-			 score = score + score_update; 
-			 place_random_start = 1;
-			 next_state = NEW_TILE;
-			 end
-		end
+			game_state = 2'b00;
+			if(move_and_merge_done) begin
+				board = board_move;
+				score = score + score_update; 
+				place_random_start = 1;
+				next_state = NEW_TILE;
+				end
+			end
 
 		NEW_TILE: begin
 		  place_random_start = 0;
