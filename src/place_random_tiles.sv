@@ -42,8 +42,8 @@ module place_random_tiles (
       case (current_state)
         IDLE: begin
           if (start) begin
-            done_reg <= 0;
-            local_board <= board_in;
+            done_reg = 0;
+            local_board = board_in;
             next_state = SEARCH;
           end else begin
             next_state = IDLE;
@@ -60,7 +60,7 @@ module place_random_tiles (
         end
 
         FINISH: begin
-          done_reg <= 1;
+          done_reg = 1;
           next_state = IDLE;
         end
 
