@@ -9,15 +9,15 @@ module move_and_merge_tiles (
 
   logic [11:0] local_board[3:0][3:0];
   logic [19:0] local_score_update;
-  integer i, j, k;
 
-  always_ff @(clk) begin
+  always_ff @(posedge clk) begin
     local_board = board_in;
     local_score_update = 0;
     done = 1'b0;
 
     case (direction)
       4'b0001: begin // Top Move
+        int i, j, k;
         for (i = 0; i < 4; i++) begin
           // Compress
           k = 0;
@@ -56,6 +56,7 @@ module move_and_merge_tiles (
       end
 
       4'b0010: begin // Bottom Move
+        int i, j, k;
         for (i = 0; i < 4; i++) begin
           // Compress
           k = 3;
@@ -94,6 +95,7 @@ module move_and_merge_tiles (
       end
 
       4'b0100: begin // Left Move
+        int i, j, k;
         for (i = 0; i < 4; i++) begin
           // Compress
           k = 0;
@@ -132,6 +134,7 @@ module move_and_merge_tiles (
       end
 
       4'b1000: begin // Right Move
+        int i, j, k;
         for (i = 0; i < 4; i++) begin
           // Compress
           k = 3;
