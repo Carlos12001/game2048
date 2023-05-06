@@ -2,6 +2,7 @@
 
 module tb_move_and_merge_tiles;
 
+  logic clk;
   logic [3:0] direction;
   logic [11:0] board_in[3:0][3:0];
   logic [11:0] board_out[3:0][3:0];
@@ -10,6 +11,7 @@ module tb_move_and_merge_tiles;
 
   // Instantiate the design under test (DUT)
   move_and_merge_tiles dut (
+    .clk(clk),
     .direction(direction),
     .board_in(board_in),
     .board_out(board_out),
@@ -17,11 +19,23 @@ module tb_move_and_merge_tiles;
     .done(done)
   );
 
-  // Clock generation
-  logic clk;
   always begin
     #5 clk = ~clk;
   end
+
+      // Display board
+  task display_board;
+    input logic [11:0] board[3:0][3:0];
+    begin
+      for (int i = 0; i < 4; i++) begin
+        for (int j = 0; j < 4; j++) begin
+          $write("%4d \t", board[i][j]);
+        end
+        $display("\n");
+      end
+      $display("\n");
+    end
+  endtask
 
   // Testbench stimulus
   initial begin
@@ -35,51 +49,64 @@ module tb_move_and_merge_tiles;
     board_in[2][0] = 12'h000; board_in[2][1] = 12'h000; board_in[2][2] = 12'h004; board_in[2][3] = 12'h000;
     board_in[3][0] = 12'h008; board_in[3][1] = 12'h000; board_in[3][2] = 12'h004; board_in[3][3] = 12'h000;
 
-        // Display results
+    // Display results
     $display("Board before move:");
-    for (integer i = 0; i < 4; i++) begin
-      $display("%h %h %h %h", board_in[i][0], board_in[i][1], board_in[i][2], board_in[i][3]);
-    end
+    display_board(board_in);
 
     if (done) begin 
       $display("Done_1");
     end
 
     #10;
-     if (done) begin 
-      $display("Done_2"); 
-    end
-
     direction = 4'b0010;
-
-    // Apply stimulus and wait for results
     #10;
+    direction = 4'b0000;
     if (done) begin 
       $display("Done_3"); 
     end
-
-
     // Display results
-    $display("Board after move:");
-    for (integer i = 0; i < 4; i++) begin
-      $display("%h %h %h %h", board_out[i][0], board_out[i][1], board_out[i][2], board_out[i][3]);
-    end
-    $display("Score update: %h", score_update);
-
+    $display("Board after bottom move:");
+    display_board(board_out);
     board_in = board_out;
 
     #10;
- 
+    direction = 4'b0001;
+    #10;
     direction = 4'b0000;
     if (done) begin 
       $display("Done_4"); 
     end
+    // Display results
+    $display("Board after top move:");
+    display_board(board_out);
+    board_in = board_out;
+
 
     #10;
-
+    direction = 4'b0100;
+    #10;
+    direction = 4'b0000;
     if (done) begin 
-      $display("Done_5"); 
+      $display("Done_6"); 
     end
+    // Display results
+    $display("Board after left move:");
+    display_board(board_out);
+    board_in = board_out;
+
+
+    #10;
+    direction = 4'b1000;
+    #10;
+    direction = 4'b0000;
+    if (done) begin 
+      $display("Done_8"); 
+    end
+    // Display results
+    $display("Board after right move:");
+    display_board(board_out);
+    board_in = board_out; 
+
 
     // Finish simulation
     $finish;
