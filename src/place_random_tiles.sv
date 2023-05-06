@@ -23,55 +23,55 @@ module place_random_tiles (
 
   // Variables temporales
   logic [11:0] local_board[3:0][3:0];
-  integer row, col;
+  logic [1:0] row, col;
+  logic done_reg;
 
-  // Señal de control para cambiar de estado
-  logic move_to_next_state;
-  
   // Logica de estado
   always @(posedge clk or posedge rst) begin
     if (rst) begin
       current_state <= IDLE;
+      row <= 2'b0;
+      col <= 2'b0;
+      local_board <= board_in;
+      done_reg <= 1'b0;
     end else begin
       current_state <= next_state;
+      row <= lfsr[3:2];
+      col <= lfsr[1:0];
+      
+      case (current_state)
+        IDLE: begin
+          if (start) begin
+            done_reg <= 0;
+            local_board <= board_in;
+            next_state = SEARCH;
+          end else begin
+            next_state = IDLE;
+          end
+        end
+
+        SEARCH: begin
+          if (board_in[row][col] == 0) begin
+            local_board[row][col] = 12'h002;
+            next_state = FINISH;
+          end else begin
+            next_state = SEARCH;
+          end
+        end
+
+        FINISH: begin
+          done_reg <= 1;
+          next_state = IDLE;
+        end
+
+        default: begin
+          next_state = IDLE;
+        end
+      endcase
     end
   end
 
-  always_comb begin
-    row = lfsr[3:2];
-    col = lfsr[1:0];
-
-    case (current_state)
-      IDLE: begin
-        if (start) begin
-          done = 0;
-          local_board = board_in;
-          next_state = SEARCH;
-        end else begin
-          next_state = IDLE;
-        end
-      end
-
-      SEARCH: begin
-        if (board_in[row][col] == 0) begin
-          local_board[row][col] = 12'h002;
-          next_state = FINISH;
-        end else begin
-          next_state = SEARCH;
-        end
-      end
-
-      FINISH: begin
-        done = 1;
-        next_state = IDLE;
-      end
-
-      default: begin
-        next_state = IDLE;
-      end
-    endcase
-  end
-
   assign board_out = local_board;
+  assign done = done_reg;
 
 endmodule
