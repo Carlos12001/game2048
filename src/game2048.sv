@@ -70,7 +70,7 @@ module game2048(
 		end
 	end
 
-	always_comb begin
+	always @(*) begin
 
 	 case (current_state)
 		START: begin

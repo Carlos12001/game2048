@@ -1,5 +1,4 @@
 module move_and_merge_tiles (
-  input logic clk,
   input logic [3:0] direction,
   input logic [11:0] board_in[3:0][3:0],
   output logic [11:0] board_out[3:0][3:0],
@@ -9,8 +8,9 @@ module move_and_merge_tiles (
 
   logic [11:0] local_board[3:0][3:0];
   logic [19:0] local_score_update;
+  int i, j, k;
 
-  always_ff @(posedge clk) begin
+  always @(*) begin
     local_board = board_in;
     local_score_update = 0;
     done = 1'b0;
