@@ -37,7 +37,7 @@ module place_random_tiles (
     end
   end
 
-  always_comb begin
+  always @(*) begin
     row = lfsr[3:2];
     col = lfsr[1:0];
 

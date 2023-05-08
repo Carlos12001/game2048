@@ -10,7 +10,7 @@ module move_and_merge_tiles (
   logic [19:0] local_score_update;
   integer i, j, k;
 
-  always_comb begin
+  always @(*) begin
     local_board = board_in;
     local_score_update = 0;
     done = 1'b0;
