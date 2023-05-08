@@ -1,83 +1,3 @@
-module place_random_tiles (
-  input logic clk,
-  input logic rst,
-  input logic start,
-  input logic [11:0] board_in[3:0][3:0],
-  output logic [11:0] board_out[3:0][3:0],
-  output logic done
-);
-
-  // LFSR para generar números pseudoaleatorios
-  logic [3:0] lfsr;
-  always @(posedge clk or posedge rst) begin
-    if (rst) begin
-      lfsr <= 4'b0001;
-    end else begin
-      lfsr <= {lfsr[2:0], lfsr[3] ^ lfsr[2]};
-    end
-  end
-
-  // Estados
-  typedef enum logic [1:0] {IDLE, SEARCH, FINISH} state_t;
-  state_t current_state, next_state;
-
-  // Variables temporales
-  logic [11:0] local_board[3:0][3:0];
-  logic [1:0] row, col;
-  logic done_reg;
-
-  // Logica de estado
-  always @(posedge clk or posedge rst) begin
-    if (rst) begin
-      current_state <= IDLE;
-      row <= 2'b0;
-      col <= 2'b0;
-      local_board <= board_in;
-      done_reg <= 1'b1;
-    end else begin
-      current_state <= next_state;
-      row <= lfsr[3:2];
-      col <= lfsr[1:0];
-      
-      case (current_state)
-        IDLE: begin
-          if (start) begin
-            done_reg = 0;
-            local_board = board_in;
-            next_state = SEARCH;
-          end else begin
-            next_state = IDLE;
-          end
-        end
-
-        SEARCH: begin
-          if (board_in[row][col] == 0) begin
-            done_reg = 1;
-            local_board[row][col] = 12'h002;
-            next_state = FINISH;
-          end else begin
-            next_state = SEARCH;
-          end
-        end
-
-        FINISH: begin
-          done_reg = 1;
-          next_state = IDLE;
-        end
-
-        default: begin
-          next_state = IDLE;
-        end
-      endcase
-    end
-  end
-
-  assign board_out = local_board;
-  assign done = done_reg;
-
-endmodule
-
-
 /*
  2048 game module
  direction: 0001 top, 0010 bottom, 0100 left, 1000 right
@@ -110,7 +30,6 @@ module game2048(
 	logic check_new_tile_result;
 
 	move_and_merge_tiles move_and_merge (
-	 .clk(clk),
 	 .direction(direction),
 	 .board_in(board),
 	 .board_out(board_move),
@@ -151,7 +70,7 @@ module game2048(
 		end
 	end
 
-	always_ff @(posedge clk) begin
+	always_comb begin
 
 	 case (current_state)
 		START: begin
@@ -170,8 +89,13 @@ module game2048(
 			place_random_start = 0;
 			if (place_random_done) begin
 				board = board_random;
-				next_state = SECOND_RANDOM_TILE;
+				next_state = TRANSITION_SECOND_RANDOM;
 		  end
+		end
+
+		TRANSITION_SECOND_RANDOM: begin
+			place_random_start = 1;
+			next_state = SECOND_RANDOM_TILE;
 		end
 
 		SECOND_RANDOM_TILE: begin
@@ -195,7 +119,7 @@ module game2048(
 				board = board_move;
 				score = score + score_update; 
 				next_state = TRANSITION_NEW_RANDOM;
-			end
+				end
 		end
 
 		TRANSITION_NEW_RANDOM: begin
