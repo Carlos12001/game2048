@@ -6,52 +6,58 @@ module top_module (
 	input logic left_button,
 	input logic right_button,
 	input logic [8:0] num_max_win_switches,
-	output logic [3:0] game_state_leds,
+	output logic [9:0] game_state_leds,
 	output logic [6:0] display_units,
 	output logic [6:0] display_tens,
 	output logic [6:0] display_hundreds,
 	output logic [6:0] display_thousands,
 	output logic [6:0] display_ten_thousands,
-	output logic [6:0] display_hundred_thousands 
+	output logic [6:0] display_hundred_thousands,
+	output logic CLK_VGA, 
+   output logic SYNC_H, SYNC_V, SYNC_B, SYNC_BLANK, 
+   output logic [7:0] Red, Green, Blue
 );
 
 	// Variables internas
-	logic [11:0] num_max_win;
+	logic [11:0] num_max_win = 12'b100000000000;
 	logic [3:0] direction;
 	logic [11:0] board[3:0][3:0];
 	logic [19:0] score;
 	logic [1:0] game_state;
-	logic [6:0] num_units;
-	logic [6:0] num_tens;
-	logic [6:0] num_hundreds;
-	logic [6:0] num_thousands;
-	logic [6:0] num_ten_thousands;
-	logic [6:0] num_hundred_thousands;
+	logic [3:0] num_units;
+	logic [3:0] num_tens;
+	logic [3:0] num_hundreds;
+	logic [3:0] num_thousands;
+	logic [3:0] num_ten_thousands;
+	logic [3:0] num_hundred_thousands;
+	/*
+		button_debouncer bd_top (
+		.clk(clk),
+		.reset(rst_switch),
+		.button_in(top_button),
+		.button_out(direction[0])
+	);
+	button_debouncer bd_bottom (
+		.clk(clk),
+		.reset(rst_switch),
+		.button_in(bottom_button),
+		.button_out(direction[1])
+	);
+	button_debouncer bd_left (
+		.clk(clk),
+		.reset(rst_switch),
+		.button_in(left_button),
+		.button_out(direction[2])
+	);
+	button_debouncer bd_right (
+		.clk(clk),
+		.reset(rst_switch),
+		.button_in(right_button),
+		.button_out(direction[3])
+	);
+	*/
 
-	// Conectar num_max_win a num_max_win_switches
-	always_ff @(posedge clk) begin
-		num_max_win[11] <= num_max_win_switches[8];
-		num_max_win[10] <= num_max_win_switches[7];
-		num_max_win[9] <= num_max_win_switches[6];
-		num_max_win[8] <= num_max_win_switches[5];
-		num_max_win[7] <= num_max_win_switches[4];
-		num_max_win[6] <= num_max_win_switches[3];
-		num_max_win[5] <= num_max_win_switches[2];
-		num_max_win[4] <= num_max_win_switches[1];
-		num_max_win[3] <= num_max_win_switches[0];
-		num_max_win[2] <= 0;
-		num_max_win[1] <= 0;
-		num_max_win[0] <= 0;
-	end
 
-	// Conectar la dirección a los botones de entrada
-	always_ff @(posedge clk) begin
-		if (top_button) direction <= 4'b0001;
-		else if (bottom_button) direction <= 4'b0010;
-		else if (left_button) direction <= 4'b0100;
-		else if (right_button) direction <= 4'b1000;
-		else direction <= 4'b0000;
-	end
 
 		// Instancia del módulo game2048
 	game2048 game (
@@ -63,7 +69,8 @@ module top_module (
 		.score(score),
 		.game_state(game_state)
 	);
-
+	Controller_VGA controllerVGA(.clk(clk),.game_state(game_state),.matrix_table(board),.CLK_VGA(CLK_VGA),.SYNC_H(SYNC_H), .SYNC_V(SYNC_V), .SYNC_B(SYNC_B), .SYNC_BLANK(SYNC_BLANK),.Red(Red), .Green(Green), .Blue(Blue));
+	
 	bin_converter uut_converter(
         .bin(score),
         .bin_units(num_units),
@@ -75,7 +82,7 @@ module top_module (
 	);
 
     // unit segments
-    bin_to_bcd_decoder uut_unit_d(
+	 bin_to_bcd_decoder uut_unit_d(
         .bin_number(num_units),
         .bcd_number(display_units)
     );
@@ -110,7 +117,36 @@ module top_module (
 		.bcd_number(display_hundred_thousands)
 	);
 
-	// Conectar game_state a game_state_leds
-	assign game_state_leds = game_state;
+	// 	button_debouncer bd_top (
+	// 	.clk(clk),
+	// 	.reset(rst_switch),
+	// 	.button_in(top_button),
+	// 	.button_out(direction[0])
+	// );
+	// button_debouncer bd_bottom (
+	// 	.clk(clk),
+	// 	.reset(rst_switch),
+	// 	.button_in(bottom_button),
+	// 	.button_out(direction[1])
+	// );
+	// button_debouncer bd_left (
+	// 	.clk(clk),
+	// 	.reset(rst_switch),
+	// 	.button_in(left_button),
+	// 	.button_out(direction[2])
+	// );
+	// button_debouncer bd_right (
+	// 	.clk(clk),
+	// 	.reset(rst_switch),
+	// 	.button_in(right_button),
+	// 	.button_out(direction[3])
+	// );
+
+
+	// Asignación de game_state y botones a game_state_leds
+	assign game_state_leds = {~right_button, ~left_button, ~bottom_button, ~top_button, 1'b0,1'b0,1'b0,1'b0, game_state};
+
+	// // Asignación de botones a direction
+	assign direction = {~right_button, ~left_button, ~bottom_button,~ top_button};
 
 endmodule
