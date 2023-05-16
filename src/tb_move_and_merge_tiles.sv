@@ -11,7 +11,6 @@ module tb_move_and_merge_tiles;
 
   // Instantiate the design under test (DUT)
   move_and_merge_tiles dut (
-    .clk(clk),
     .direction(direction),
     .board_in(board_in),
     .board_out(board_out),
